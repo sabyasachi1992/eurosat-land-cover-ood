@@ -92,7 +92,7 @@ Click any badge above or use these direct links:
 Steps:
 1. Click the link for notebook 01
 2. In Colab, go to **Runtime → Change runtime type → T4 GPU**
-3. Run all cells (**Runtime → Run all**) — Cell 0 automatically clones the repo, installs dependencies, and downloads the EuroSAT dataset from Zenodo
+3. Run all cells (**Runtime → Run all**) — Cell 0 automatically clones the repo, installs dependencies, and downloads the EuroSAT dataset from DFKI
 4. After notebook 01 completes, open notebook 02 and repeat (the dataset will already be cached in `/content/`)
 5. Run notebooks in order: 01 → 02 → 03 → 04 (each depends on outputs from the previous)
 
@@ -109,10 +109,12 @@ cd eurosat-land-cover-ood
 
 #### 2. Download the EuroSAT Dataset
 
-Download the EuroSAT RGB dataset from the official source:
+Download the EuroSAT RGB dataset:
 
+- **Direct download:** [https://madm.dfki.de/files/sentinel/EuroSAT.zip](https://madm.dfki.de/files/sentinel/EuroSAT.zip)
 - **Source:** [EuroSAT: Land Use and Land Cover Classification with Sentinel-2](https://github.com/phelber/EuroSAT)
-- **Direct download:** The RGB version (EuroSAT.zip) contains 27,000 labeled 64×64 Sentinel-2 patches across 10 land cover classes.
+
+The zip contains 27,000 labeled 64×64 Sentinel-2 patches across 10 land cover classes.
 
 Extract the dataset so the directory structure is:
 ```
