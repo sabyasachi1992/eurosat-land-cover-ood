@@ -10,11 +10,11 @@ After deploying the 6-class classifier (Task 1), the system encounters satellite
 
 The evaluation simulates a realistic post-deployment scenario:
 - **~2,000 known-class patches** randomly sampled from the test set (in-distribution)
-- **~10,800 ghost-class patches** from all 4 withheld classes (out-of-distribution)
+- **10,000 ghost-class patches** from all 4 withheld classes (out-of-distribution)
 - All labels are stripped and the pool is shuffled with seed=42
 - Ground-truth labels are retained separately and used only for final metric computation — they never influence detection or clustering decisions
 
-This creates a heavily OOD-skewed pool (~84% ghost), which is intentional: in real deployment, novel terrain types may dominate certain geographic regions.
+This creates a heavily OOD-skewed pool (~83% ghost), which is intentional: in real deployment, novel terrain types may dominate certain geographic regions.
 
 ## 2. Softmax Confidence Baseline
 

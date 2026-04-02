@@ -10,7 +10,7 @@ The pipeline follows a modular design: all logic resides in importable Python mo
 
 - **Dataset:** EuroSAT RGB, 10 classes total (6 known + 4 ghost). Only the 6 known classes are used for Task 1.
 - **Split:** 70% train / 15% validation / 15% test, stratified by class, seeded for determinism.
-- **Normalization:** Per-channel mean and standard deviation computed exclusively from training images, then applied identically to validation, test, and unlabeled pool sets. Statistics are persisted to `outputs/norm_stats.json`.
+- **Normalization:** Per-channel mean and standard deviation computed exclusively from training images (mean=[0.342, 0.378, 0.411], std=[0.218, 0.150, 0.127]), then applied identically to validation, test, and unlabeled pool sets. Statistics are persisted to `outputs/norm_stats.json`.
 - **Augmentation (training only):** Random horizontal flip, random vertical flip, random rotation (±15°), and random color jitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1). Each transform is independently toggleable via config.
 
 ## 3. Architecture Comparison
@@ -123,21 +123,25 @@ The final model was trained for 61 epochs (early stopping triggered at epoch 61,
 
 ## 10. Honest Failure Analysis
 
-### Expected Confusions
+### Observed Confusions
 
 The confusion matrix from the test set reveals the following patterns (28 total misclassifications out of 2,550):
 
-1. **AnnualCrop ↔ SeaLake (5+2 errors):** AnnualCrop was misclassified as SeaLake twice, and SeaLake as AnnualCrop five times. Irrigated crop fields can appear as uniform blue-green patches that superficially resemble calm water bodies in Sentinel-2 RGB composites.
+1. **SeaLake → AnnualCrop (5 errors) and AnnualCrop → SeaLake (2 errors):** The largest single off-diagonal entry. Irrigated crop fields can appear as uniform blue-green patches that superficially resemble calm water bodies in Sentinel-2 RGB composites. Conversely, shallow coastal waters with sediment can appear greenish-brown.
 
-2. **Industrial ↔ Residential (5+2 errors):** Industrial patches were misclassified as Residential five times. Both classes feature built-up structures with similar grey/brown tones at 64×64 resolution. The distinction between warehouses and apartment blocks is subtle from above.
+2. **Residential → Industrial (5 errors) and Industrial → Residential (2 errors):** Both classes feature built-up structures with similar grey/brown tones at 64×64 resolution. The distinction between warehouses and apartment blocks is subtle from above.
 
-3. **Highway ↔ Industrial (3 errors):** Highway patches were misclassified as Industrial three times. Highway patches often include adjacent industrial zones (warehouses, parking lots), and both feature grey/asphalt-dominated textures.
+3. **Industrial → AnnualCrop (3 errors):** Regular grid patterns in both classes (crop rows vs. building rows) create visual ambiguity at low resolution.
 
-4. **AnnualCrop ↔ Industrial (3 errors):** Industrial was misclassified as AnnualCrop three times. Regular grid patterns in both classes (crop rows vs. building rows) create visual ambiguity at low resolution.
+4. **Highway → Industrial (3 errors):** Highway patches often include adjacent industrial zones (warehouses, parking lots), and both feature grey/asphalt-dominated textures with linear structures.
+
+5. **SeaLake → Forest (2 errors):** Dark water bodies can resemble shadowed forest canopy, especially in patches with low sun angle or deep water.
+
+6. **Industrial → Highway (2 errors):** Industrial areas with access roads can be confused with highway patches at this resolution.
 
 ### Structural Limitations
 
 - **No temporal context:** EuroSAT provides single-date patches. Temporal sequences would dramatically improve crop vs. vegetation disambiguation.
 - **64×64 resolution constraint:** Fine-grained spatial patterns (e.g., building edges, road markings) are lost at this resolution, limiting the model's ability to distinguish structurally similar classes.
-- **Training from scratch:** Without pretrained features from ImageNet or similar, the model must learn all low-level and mid-level visual features from ~12,600 training images (70% of ~18,000 known-class images). This is a modest dataset size for learning from scratch.
+- **Training from scratch:** Without pretrained features from ImageNet or similar, the model must learn all low-level and mid-level visual features from 11,900 training images (70% of 17,000 known-class images). This is a modest dataset size for learning from scratch.
 - **Class imbalance:** While EuroSAT is relatively balanced (~2,500–3,000 images per class), Highway has fewer samples (~2,500) compared to others (~3,000), which may slightly reduce Highway recall.
