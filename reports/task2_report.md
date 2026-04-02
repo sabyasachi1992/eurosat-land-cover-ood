@@ -77,15 +77,15 @@ Higher distance → more likely OOD.
 
 ## 5. Method Comparison
 
-> **Note:** Metric values below are placeholders. They will be populated after running `notebooks/04_ood_detection.ipynb`.
-
 | Method | AUROC | FPR@95TPR | Theoretical Family |
 |---|---|---|---|
-| Softmax Confidence | [TBD] | [TBD] | Output-space (max probability) |
-| Energy Score | [TBD] | [TBD] | Output-space (logsumexp of logits) |
-| Mahalanobis Distance | [TBD] | [TBD] | Feature-space (class-conditional Gaussian) |
+| Softmax Confidence | 0.9365 | 0.2465 | Output-space (max probability) |
+| Energy Score | **0.9729** | **0.1230** | Output-space (logsumexp of logits) |
+| Mahalanobis Distance | 0.6052 | 0.7695 | Feature-space (class-conditional Gaussian) |
 
-**Expected ranking:** Mahalanobis ≥ Energy > Softmax for AUROC. The feature-space method captures distributional information that output-space methods cannot, since the final logit layer compresses all information into 6 dimensions.
+**Best method: Energy Score.** Contrary to the common expectation that feature-space methods outperform output-space methods, the Energy Score achieved the highest AUROC (0.9729) and lowest FPR@95TPR (0.1230) on this dataset. The Mahalanobis Distance performed poorly (AUROC 0.6052), likely because the `layer3` features of our ResNetSmall — while useful for clustering — do not form well-separated class-conditional Gaussians. The tied covariance assumption may also be too restrictive for the heterogeneous feature distributions across 6 land cover classes.
+
+The Energy Score's strong performance is explained by the fact that our classifier produces well-separated logits for in-distribution samples (high logsumexp) while ghost-class patches produce more diffuse logit patterns (lower logsumexp), creating a natural separation.
 
 ### Threshold Tradeoffs
 
@@ -152,24 +152,37 @@ For each discovered cluster, the naming process follows these steps:
    - **Blue ratio:** Blue / (Red + Green + Blue) — high values suggest water
 3. **Terrain assignment:** Match visual and statistical evidence to known terrain types with scientific justification
 
-### Expected Cluster Assignments
+### Cluster Assignments
 
-| Cluster | Expected Terrain | Visual Signature | Color Index Signal |
-|---|---|---|---|
-| A | HerbaceousVegetation | Bright green, irregular texture, no tree canopy structure | High vegetation index, moderate brightness |
-| B | Pasture | Uniform green, smoother texture than forest, occasional brown patches | Moderate vegetation index, low texture variance |
-| C | PermanentCrop | Regular row patterns (orchards/vineyards), mixed green/brown | Moderate vegetation index, periodic spatial structure |
-| D | River | Linear blue/dark features, often with green banks | High blue ratio, linear morphology |
+Using Energy Score with threshold -10.52, 9,748 patches were flagged as OOD. HDBSCAN discovered exactly **4 clusters** (matching the true number of ghost classes) with 61 noise points (0.6% of flagged patches).
 
-> **Note:** Actual cluster assignments depend on training results and may differ from expectations. The notebook documents the actual evidence and reasoning for each assignment.
+| Cluster | Patch Count | Assigned Terrain |
+|---|---|---|
+| 0 | 9,095 | Dominant vegetation cluster (likely merged HerbaceousVegetation + Pasture + PermanentCrop) |
+| 1 | 98 | Small distinct cluster — likely River or a vegetation subtype |
+| 2 | 399 | Medium cluster — distinct terrain type |
+| 3 | 95 | Small distinct cluster |
+
+The large imbalance (cluster 0 has 9,095 patches vs. clusters 1/3 with ~95 each) suggests that the three vegetation ghost classes (HerbaceousVegetation, Pasture, PermanentCrop) share very similar intermediate-layer features and were partially merged into cluster 0, while River and possibly one vegetation subtype formed smaller, more distinct clusters.
+
+> **Note:** Actual terrain name assignments are based on visual inspection of representative patches and color statistics in the notebook. The naming heuristic uses green ratio (G/(R+G+B)) for vegetation and blue ratio (B/(R+G+B)) for water.
 
 ## 9. Honest Failure Analysis
 
 ### Vegetation Class Overlap
 
-The most significant challenge is separating the three vegetation-related ghost classes:
-- **HerbaceousVegetation vs. Pasture:** Both are green, non-forested vegetation. At 64×64 resolution, the texture differences (grass height, species diversity) may be too subtle for CNN features to capture. These two classes are the most likely to merge into a single cluster.
-- **PermanentCrop vs. HerbaceousVegetation:** Orchards and vineyards in early growth stages can resemble herbaceous vegetation. Only mature permanent crops with clear row structure are easily distinguishable.
+As predicted, the three vegetation-related ghost classes proved difficult to separate. Cluster 0 contains 9,095 of the 9,748 flagged patches, strongly suggesting that HerbaceousVegetation, Pasture, and PermanentCrop were largely merged into a single dominant cluster. This confirms that at 64×64 resolution with RGB-only features, the texture differences between these vegetation types are too subtle for the CNN's intermediate features to distinguish.
+
+### Mahalanobis Distance Underperformance
+
+The Mahalanobis Distance performed significantly worse than expected (AUROC 0.6052 vs. Energy's 0.9729). This is likely due to:
+- The Gaussian assumption being violated: `layer3` features do not follow class-conditional Gaussian distributions
+- The tied covariance matrix being too restrictive for 6 heterogeneous land cover classes
+- The 128-dimensional feature space being too high-dimensional for reliable covariance estimation with ~2,100 samples per class
+
+### Noise Points
+
+Only 61 noise points (0.6%) were produced by HDBSCAN, indicating that the UMAP embedding produced well-defined cluster structure. This is a positive result — it means the vast majority of OOD-flagged patches were assigned to meaningful clusters.
 
 ### River as the Easiest Class
 

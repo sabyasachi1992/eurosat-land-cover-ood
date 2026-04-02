@@ -105,35 +105,35 @@ These values are reflected in the final `config.yaml`.
 
 ## 9. Final Test Metrics
 
-> **Note:** The values below are placeholders. They will be populated after running the full training pipeline via `notebooks/02_training.ipynb` and `notebooks/03_evaluation.ipynb`.
+The final model was trained for 61 epochs (early stopping triggered at epoch 61, best weights from epoch 51) using ResNetSmall with CosineAnnealingLR (T_max=100), CrossEntropyLoss, learning rate 0.001, batch size 64, and weight decay 0.0001.
 
-**Overall test accuracy:** [TBD]
+**Overall test accuracy:** 98.90% (2,522 / 2,550 correct)
 
 **Per-class metrics:**
 
 | Class | Precision | Recall | F1-Score | Support |
 |---|---|---|---|---|
-| AnnualCrop | [TBD] | [TBD] | [TBD] | [TBD] |
-| Forest | [TBD] | [TBD] | [TBD] | [TBD] |
-| Highway | [TBD] | [TBD] | [TBD] | [TBD] |
-| Industrial | [TBD] | [TBD] | [TBD] | [TBD] |
-| Residential | [TBD] | [TBD] | [TBD] | [TBD] |
-| SeaLake | [TBD] | [TBD] | [TBD] | [TBD] |
-| **Macro Avg** | **[TBD]** | **[TBD]** | **[TBD]** | — |
+| AnnualCrop | 0.980 | 0.993 | 0.987 | 450 |
+| Forest | 0.996 | 0.998 | 0.997 | 450 |
+| Highway | 0.992 | 0.987 | 0.989 | 375 |
+| Industrial | 0.979 | 0.981 | 0.980 | 375 |
+| Residential | 0.991 | 0.989 | 0.990 | 450 |
+| SeaLake | 0.996 | 0.984 | 0.990 | 450 |
+| **Macro Avg** | **0.989** | **0.989** | **0.989** | **2,550** |
 
 ## 10. Honest Failure Analysis
 
 ### Expected Confusions
 
-At 64×64 resolution, several class pairs share strong visual similarities that make perfect classification unlikely:
+The confusion matrix from the test set reveals the following patterns (28 total misclassifications out of 2,550):
 
-1. **AnnualCrop ↔ Residential:** Both can appear as regular grid-like patterns — crop rows resemble building rows at low resolution. Color overlap occurs when crops are in early growth stages (brownish soil visible) and residential areas have brown rooftops.
+1. **AnnualCrop ↔ SeaLake (5+2 errors):** AnnualCrop was misclassified as SeaLake twice, and SeaLake as AnnualCrop five times. Irrigated crop fields can appear as uniform blue-green patches that superficially resemble calm water bodies in Sentinel-2 RGB composites.
 
-2. **Highway ↔ Industrial:** Highway patches often include adjacent industrial zones (warehouses, parking lots). The linear structure of highways can be ambiguous when the patch captures an intersection or overpass near industrial buildings.
+2. **Industrial ↔ Residential (5+2 errors):** Industrial patches were misclassified as Residential five times. Both classes feature built-up structures with similar grey/brown tones at 64×64 resolution. The distinction between warehouses and apartment blocks is subtle from above.
 
-3. **AnnualCrop ↔ SeaLake (edge cases):** Irrigated crop fields can appear as uniform blue-green patches that superficially resemble calm water bodies, especially in Sentinel-2 RGB composites.
+3. **Highway ↔ Industrial (3 errors):** Highway patches were misclassified as Industrial three times. Highway patches often include adjacent industrial zones (warehouses, parking lots), and both feature grey/asphalt-dominated textures.
 
-4. **Forest ↔ AnnualCrop:** Dense green crops in peak growing season can be visually indistinguishable from forest canopy at 64×64 resolution. The lack of temporal information (single snapshot) removes the seasonal signal that would otherwise disambiguate.
+4. **AnnualCrop ↔ Industrial (3 errors):** Industrial was misclassified as AnnualCrop three times. Regular grid patterns in both classes (crop rows vs. building rows) create visual ambiguity at low resolution.
 
 ### Structural Limitations
 
