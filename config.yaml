@@ -1,0 +1,64 @@
+# Paths
+dataset_root: "EuroSAT/2750"
+output_dir: "outputs"
+weights_path: "outputs/best_model.pt"
+norm_stats_path: "outputs/norm_stats.json"
+
+# Reproducibility
+seed: 42
+
+# Classes
+known_classes:
+  - AnnualCrop
+  - Forest
+  - Highway
+  - Industrial
+  - Residential
+  - SeaLake
+ghost_classes:
+  - HerbaceousVegetation
+  - Pasture
+  - PermanentCrop
+  - River
+
+# Data splits
+train_ratio: 0.70
+val_ratio: 0.15
+test_ratio: 0.15
+unlabeled_known_count: 2000
+
+# Augmentation (each independently toggleable)
+augmentation:
+  horizontal_flip: true
+  vertical_flip: true
+  random_rotation: 15
+  color_jitter:
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.1
+
+# Model
+architecture: "resnet_small"
+
+# Training
+batch_size: 64
+learning_rate: 0.001
+weight_decay: 0.0001
+epochs: 100
+loss_function: "cross_entropy"
+label_smoothing: 0.1
+scheduler: "cosine_annealing"
+scheduler_params:
+  step_size: 10
+  gamma: 0.1
+  T_max: 100
+early_stopping_patience: 10
+
+# OOD Detection
+ood_feature_layer: "layer3"
+umap_n_neighbors: 15
+umap_min_dist: 0.1
+umap_n_components: 2
+hdbscan_min_cluster_size: 50
+hdbscan_min_samples: 10

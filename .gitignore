@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Kiro spec files (internal development)
+.kiro/
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Dataset (too large for git — download separately)
+EuroSAT/
+EuroSAT.zip
+
+# Model weights (too large for git — hosted externally)
+outputs/*.pt
+
+# AWS / Cloud deployment files (not part of submission)
+awscliv2.zip
+cloud_config.json
+cloud_scripts/
+deploy_pipeline.py
+deploy_via_ssm.py
+setup_cloud_pipeline.py
+setup_ec2_access.ps1
+setup_ec2_via_ssm.py
+
+# Temporary / deployment docs (not part of submission)
+CLOUD_DEPLOYMENT_SUMMARY.txt
+CLOUD_READINESS_CHECKLIST.md
+DEPLOYMENT_INSTRUCTIONS.md
+DEPLOYMENT_STATUS_REPORT.md
+EC2_SETUP_GUIDE.md
+FINAL_DEPLOYMENT_SUMMARY.txt
+GPU_DRIVER_FIX_GUIDE.md
+GPU_DRIVER_ISSUE_RESOLUTION.md
+GPU_QUICK_FIX.txt
+MANUAL_DEPLOYMENT_VIA_CONSOLE.md
+NVIDIA_DRIVER_FIX_CORRECTED.md
+NVIDIA_INSTALL_COMMAND.txt
+SSH_CONNECTIVITY_INVESTIGATION.md
+ec2_setup_commands.sh
+fix_gpu_driver.sh
+fix_gpu_final.sh
+fix_gpu_final.sh
+fix_nvidia_driver_correct.sh
+
+# Word docs
+*.docx
+~$*
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Pipeline runner (development utility)
+run_pipeline.py
+
+# Log files
+outputs/pipeline.log
