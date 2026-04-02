@@ -111,11 +111,21 @@ pip install -r requirements.txt
 
 ### 4. Run Notebooks in Order
 
-Execute the notebooks sequentially — each depends on outputs from the previous:
+Execute the notebooks sequentially — each depends on outputs from the previous.
+
+From the **project root directory**, launch Jupyter:
 
 ```bash
-jupyter notebook
+jupyter notebook notebooks/
 ```
+
+Or open each notebook individually:
+
+```bash
+jupyter notebook notebooks/01_data_exploration.ipynb
+```
+
+The notebooks auto-detect the project root, so they work whether launched from the project root or the `notebooks/` directory.
 
 1. **`01_data_exploration.ipynb`** — Load dataset, visualize class distributions, compute normalization stats, verify stratified splits
 2. **`02_training.ipynb`** — Train models, compare architectures/losses/schedulers, run overfitting/underfitting experiments, hyperparameter tuning, save best weights
