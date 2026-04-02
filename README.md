@@ -1,5 +1,10 @@
 # EuroSAT Land Cover Classification & Out-of-Distribution Detection
 
+[![Open Notebook 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/01_data_exploration.ipynb)
+[![Open Notebook 02 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/02_training.ipynb)
+[![Open Notebook 03 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/03_evaluation.ipynb)
+[![Open Notebook 04 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/04_ood_detection.ipynb)
+
 A two-task machine learning pipeline for satellite image classification and out-of-distribution (OOD) ghost class discovery on the EuroSAT RGB dataset. Task 1 trains a land cover classifier from scratch on 6 known classes using 64×64 Sentinel-2 RGB patches — no pretrained weights are used anywhere. Task 2 builds a post-deployment monitoring pipeline that detects patches from 4 unseen "ghost" classes, clusters them using UMAP + HDBSCAN, and assigns human-readable terrain names based on visual and statistical evidence.
 
 The system is designed for full reproducibility: a single YAML config controls all hyperparameters, paths, and seeds. All logic lives in modular Python source files under `src/`, while Jupyter notebooks serve as thin orchestration and visualization layers. Random seed 42 is used throughout, set for Python, NumPy, and PyTorch at the start of every notebook.
@@ -73,14 +78,36 @@ The system is designed for full reproducibility: a single YAML config controls a
 
 ## Reproduction Steps
 
-### 1. Clone the Repository
+### Option A: Run on Google Colab (Recommended — GPU, no local setup)
+
+Click any badge above or use these direct links:
+
+| Notebook | Link | Runtime |
+|---|---|---|
+| 01 — Data Exploration | [Open in Colab](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/01_data_exploration.ipynb) | ~2 min |
+| 02 — Training | [Open in Colab](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/02_training.ipynb) | ~30–60 min (GPU) |
+| 03 — Evaluation | [Open in Colab](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/03_evaluation.ipynb) | ~2 min |
+| 04 — OOD Detection | [Open in Colab](https://colab.research.google.com/github/sabyasachi1992/eurosat-land-cover-ood/blob/main/notebooks/04_ood_detection.ipynb) | ~10 min |
+
+Steps:
+1. Click the link for notebook 01
+2. In Colab, go to **Runtime → Change runtime type → T4 GPU**
+3. Run all cells (**Runtime → Run all**) — Cell 0 automatically clones the repo, installs dependencies, and downloads the EuroSAT dataset from Zenodo
+4. After notebook 01 completes, open notebook 02 and repeat (the dataset will already be cached in `/content/`)
+5. Run notebooks in order: 01 → 02 → 03 → 04 (each depends on outputs from the previous)
+
+No manual downloads needed — everything is handled by Cell 0.
+
+### Option B: Run Locally
+
+#### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/sabyasachi1992/eurosat-land-cover-ood.git
+cd eurosat-land-cover-ood
 ```
 
-### 2. Download the EuroSAT Dataset
+#### 2. Download the EuroSAT Dataset
 
 Download the EuroSAT RGB dataset from the official source:
 
@@ -103,13 +130,13 @@ EuroSAT/
     └── SeaLake/          (3,000 images)
 ```
 
-### 3. Install Dependencies
+#### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run Notebooks in Order
+#### 4. Run Notebooks in Order
 
 Execute the notebooks sequentially — each depends on outputs from the previous.
 
