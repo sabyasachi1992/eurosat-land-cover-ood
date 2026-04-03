@@ -203,7 +203,7 @@ The notebooks auto-detect the project root, so they work whether launched from t
 
 - **Modular `src/` + thin notebooks.** All logic is in importable Python modules with clear interfaces. Notebooks only orchestrate, visualize, and narrate. This keeps code testable and avoids notebook-only logic that is hard to debug.
 
-- **Label Smoothing (α=0.1) for better OOD calibration.** Label smoothing prevents the model from becoming overconfident on known classes, which improves the separation between in-distribution and out-of-distribution confidence scores in Task 2.
+- **Loss function comparison (CrossEntropy vs Label Smoothing).** Both loss functions were evaluated. CrossEntropyLoss was selected for the final model based on marginally better raw accuracy. Label smoothing was shown to provide better confidence calibration, which is documented as a tradeoff in the training notebook.
 
 - **UMAP + HDBSCAN for unsupervised ghost class discovery.** UMAP preserves both local and global structure (unlike t-SNE) and HDBSCAN automatically determines the number of clusters (unlike k-means). This combination is well-suited for discovering an unknown number of ghost classes.
 

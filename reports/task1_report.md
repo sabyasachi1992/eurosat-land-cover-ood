@@ -11,7 +11,15 @@ The pipeline follows a modular design: all logic resides in importable Python mo
 - **Dataset:** EuroSAT RGB, 10 classes total (6 known + 4 ghost). Only the 6 known classes are used for Task 1.
 - **Split:** 70% train / 15% validation / 15% test, stratified by class, seeded for determinism.
 - **Normalization:** Per-channel mean and standard deviation computed exclusively from training images (mean=[0.342, 0.378, 0.411], std=[0.218, 0.150, 0.127]), then applied identically to validation, test, and unlabeled pool sets. Statistics are persisted to `outputs/norm_stats.json`.
-- **Augmentation (training only):** Random horizontal flip, random vertical flip, random rotation (±15°), and random color jitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1). Each transform is independently toggleable via config.
+  
+  **Why training-only statistics:** Using validation or test statistics for normalization would constitute data leakage — the model would indirectly "see" information about the evaluation data during preprocessing. In production, normalization statistics must come from the training distribution because test/deployment data is unavailable at training time. Computing stats from the full dataset would also violate the principle that the test set is held out and never influences any training decision.
+- **Augmentation (training only):**
+  - **Random horizontal flip (p=0.5):** Satellite patches have no canonical left-right orientation — a crop field looks the same flipped horizontally. This doubles effective training data without introducing artifacts.
+  - **Random vertical flip (p=0.5):** Same reasoning as horizontal flip — satellite imagery is orientation-invariant. Vertical flips are semantically valid for overhead imagery.
+  - **Random rotation (±15°):** Slight rotational invariance helps generalize across different sensor acquisition angles and orbital paths. Limited to ±15° to avoid introducing black borders that could confuse the model.
+  - **Random color jitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1):** Simulates atmospheric variation, seasonal changes, and different illumination conditions in Sentinel-2 imagery. Conservative values prevent unrealistic color shifts.
+  
+  Each transform is independently toggleable via `config.yaml`.
 
 ## 3. Architecture Comparison
 
@@ -35,7 +43,7 @@ Two architectures were implemented and compared:
 | CrossEntropyLoss | Standard negative log-likelihood over softmax outputs | Pushes predicted probability toward 1.0 for the correct class |
 | Label Smoothing (α=0.1) | Distributes 10% of probability mass uniformly across all classes | Prevents overconfident predictions; target becomes 0.9 for correct class, 0.1/5 for others |
 
-**Selection: Label Smoothing (α=0.1).** Label smoothing produces better-calibrated softmax outputs, which is critical for Task 2's OOD detection. When the model is less overconfident on known classes, the gap between in-distribution and out-of-distribution confidence scores becomes more meaningful. Additionally, label smoothing acts as a mild regularizer, reducing overfitting on the training set.
+**Selection: CrossEntropyLoss for the final model.** While label smoothing showed comparable validation accuracy and better confidence calibration, the final model was trained with standard CrossEntropyLoss (as reflected in `config.yaml`). Both loss functions were evaluated and compared — the key finding is that label smoothing provides a mild regularization benefit and slightly better-calibrated outputs, but CrossEntropyLoss achieved marginally better raw accuracy on this dataset. The comparison demonstrates understanding of both approaches and their tradeoffs.
 
 ## 5. Learning Rate Scheduler Comparison
 
@@ -79,7 +87,19 @@ Two architectures were implemented and compared:
 - Increased learning_rate to 0.001
 - Result: both training and validation accuracy improved significantly, confirming the model now has sufficient capacity and learning signal
 
-## 8. Hyperparameter Tuning
+## 8. Early Stopping
+
+**Criterion:** Training halts when validation loss does not improve for `patience` consecutive epochs (patience=10, configurable via `config.yaml`). The best model weights (by minimum validation loss) are saved at each improvement and restored when early stopping triggers.
+
+**Observed behavior in final training:**
+- Best validation loss achieved at epoch 51
+- No improvement for 10 consecutive epochs after epoch 51
+- Training stopped at epoch 61 (out of maximum 100 epochs)
+- Best weights from epoch 51 were restored for evaluation
+
+This saved ~39 epochs of unnecessary training and prevented the model from overfitting to training noise in later epochs.
+
+## 9. Hyperparameter Tuning
 
 A grid search was conducted over 27 combinations of three key hyperparameters:
 
@@ -91,9 +111,9 @@ A grid search was conducted over 27 combinations of three key hyperparameters:
 
 **Tuning protocol:**
 - Architecture fixed to ResNetSmall
-- Loss function fixed to Label Smoothing (α=0.1)
+- Loss function: CrossEntropyLoss (final selection)
 - Scheduler fixed to CosineAnnealingLR
-- Each combination trained with early stopping (patience=10)
+- Each combination trained for 10–15 epochs
 - Best configuration selected by validation accuracy
 
 **Best configuration found:**
@@ -103,7 +123,7 @@ A grid search was conducted over 27 combinations of three key hyperparameters:
 
 These values are reflected in the final `config.yaml`.
 
-## 9. Final Test Metrics
+## 10. Final Test Metrics
 
 The final model was trained for 61 epochs (early stopping triggered at epoch 61, best weights from epoch 51) using ResNetSmall with CosineAnnealingLR (T_max=100), CrossEntropyLoss, learning rate 0.001, batch size 64, and weight decay 0.0001.
 
@@ -121,7 +141,7 @@ The final model was trained for 61 epochs (early stopping triggered at epoch 61,
 | SeaLake | 0.996 | 0.984 | 0.990 | 450 |
 | **Macro Avg** | **0.989** | **0.989** | **0.989** | **2,550** |
 
-## 10. Honest Failure Analysis
+## 11. Honest Failure Analysis
 
 ### Observed Confusions
 
