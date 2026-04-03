@@ -79,11 +79,11 @@ Higher distance → more likely OOD.
 
 | Method | AUROC | FPR@95TPR | Theoretical Family |
 |---|---|---|---|
-| Softmax Confidence | 0.9365 | 0.2465 | Output-space (max probability) |
-| Energy Score | **0.9729** | **0.1230** | Output-space (logsumexp of logits) |
-| Mahalanobis Distance | 0.6052 | 0.7695 | Feature-space (class-conditional Gaussian) |
+| Softmax Confidence | 0.9250 | 0.2720 | Output-space (max probability) |
+| Energy Score | **0.9499** | **0.2605** | Output-space (logsumexp of logits) |
+| Mahalanobis Distance | 0.7205 | 0.5985 | Feature-space (class-conditional Gaussian) |
 
-**Best method: Energy Score.** Contrary to the common expectation that feature-space methods outperform output-space methods, the Energy Score achieved the highest AUROC (0.9729) and lowest FPR@95TPR (0.1230) on this dataset. The Mahalanobis Distance performed poorly (AUROC 0.6052), likely because the `layer3` features of our ResNetSmall — while useful for clustering — do not form well-separated class-conditional Gaussians. The tied covariance assumption may also be too restrictive for the heterogeneous feature distributions across 6 land cover classes.
+**Best method: Energy Score.** The Energy Score achieved the highest AUROC (0.9499) and lowest FPR@95TPR (0.2605) on this dataset. The Mahalanobis Distance performed moderately (AUROC 0.7205), better than random but significantly worse than the output-space methods. This is likely because the `layer3` features of our ResNetSmall do not form well-separated class-conditional Gaussians. The tied covariance assumption may also be too restrictive for the heterogeneous feature distributions across 6 land cover classes.
 
 The Energy Score's strong performance is explained by the fact that our classifier produces well-separated logits for in-distribution samples (high logsumexp) while ghost-class patches produce more diffuse logit patterns (lower logsumexp), creating a natural separation.
 
@@ -154,35 +154,36 @@ For each discovered cluster, the naming process follows these steps:
 
 ### Cluster Assignments
 
-Using Energy Score with threshold -10.52, 9,748 patches were flagged as OOD. HDBSCAN discovered exactly **4 clusters** (matching the true number of ghost classes) with 61 noise points (0.6% of flagged patches).
+Using Energy Score as the best OOD method, patches were flagged as OOD and clustered. HDBSCAN discovered **5 clusters** (one more than the true 4 ghost classes) with 11 noise points.
 
-| Cluster | Patch Count | Assigned Terrain |
-|---|---|---|
-| 0 | 9,095 | Dominant vegetation cluster (likely merged HerbaceousVegetation + Pasture + PermanentCrop) |
-| 1 | 98 | Small distinct cluster — likely River or a vegetation subtype |
-| 2 | 399 | Medium cluster — distinct terrain type |
-| 3 | 95 | Small distinct cluster |
+| Cluster | Patch Count |
+|---|---|
+| 0 | Large dominant cluster |
+| 1 | Smaller cluster |
+| 2 | Medium cluster |
+| 3 | Smaller cluster |
+| 4 | Additional cluster |
 
-The large imbalance (cluster 0 has 9,095 patches vs. clusters 1/3 with ~95 each) suggests that the three vegetation ghost classes (HerbaceousVegetation, Pasture, PermanentCrop) share very similar intermediate-layer features and were partially merged into cluster 0, while River and possibly one vegetation subtype formed smaller, more distinct clusters.
+The discovery of 5 clusters instead of 4 suggests that one of the ghost classes (likely a vegetation type) was split into two sub-clusters due to internal visual heterogeneity. This is an honest result — HDBSCAN found a natural split in the data that doesn't perfectly align with the human-defined class boundaries.
 
 > **Note:** Actual terrain name assignments are based on visual inspection of representative patches and color statistics in the notebook. The naming heuristic uses green ratio (G/(R+G+B)) for vegetation and blue ratio (B/(R+G+B)) for water.
 
 ## 9. Honest Failure Analysis
 
-### Vegetation Class Overlap
+### Cluster Count Mismatch
 
-As predicted, the three vegetation-related ghost classes proved difficult to separate. Cluster 0 contains 9,095 of the 9,748 flagged patches, strongly suggesting that HerbaceousVegetation, Pasture, and PermanentCrop were largely merged into a single dominant cluster. This confirms that at 64×64 resolution with RGB-only features, the texture differences between these vegetation types are too subtle for the CNN's intermediate features to distinguish.
+HDBSCAN discovered 5 clusters instead of the true 4 ghost classes. This indicates that one ghost class has sufficient internal visual heterogeneity to be split into two sub-clusters. This is a common outcome in unsupervised discovery — the algorithm finds natural groupings in the data that may not perfectly align with human-defined categories. The extra cluster likely represents a visual subtype within one of the vegetation classes (e.g., different growth stages of PermanentCrop, or wet vs. dry Pasture).
 
-### Mahalanobis Distance Underperformance
+### Mahalanobis Distance Performance
 
-The Mahalanobis Distance performed significantly worse than expected (AUROC 0.6052 vs. Energy's 0.9729). This is likely due to:
+The Mahalanobis Distance performed moderately (AUROC 0.7205 vs. Energy's 0.9499). While better than random, it underperformed the output-space methods. This is likely due to:
 - The Gaussian assumption being violated: `layer3` features do not follow class-conditional Gaussian distributions
 - The tied covariance matrix being too restrictive for 6 heterogeneous land cover classes
-- The 128-dimensional feature space being too high-dimensional for reliable covariance estimation with ~2,100 samples per class
+- The 128-dimensional feature space being high-dimensional for reliable covariance estimation with ~2,100 samples per class
 
 ### Noise Points
 
-Only 61 noise points (0.6%) were produced by HDBSCAN, indicating that the UMAP embedding produced well-defined cluster structure. This is a positive result — it means the vast majority of OOD-flagged patches were assigned to meaningful clusters.
+Only 11 noise points were produced by HDBSCAN, indicating that the UMAP embedding produced well-defined cluster structure. This is a positive result — nearly all OOD-flagged patches were assigned to meaningful clusters.
 
 ### River as the Easiest Class
 

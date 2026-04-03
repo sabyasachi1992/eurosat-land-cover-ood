@@ -92,12 +92,12 @@ Two architectures were implemented and compared:
 **Criterion:** Training halts when validation loss does not improve for `patience` consecutive epochs (patience=10, configurable via `config.yaml`). The best model weights (by minimum validation loss) are saved at each improvement and restored when early stopping triggers.
 
 **Observed behavior in final training:**
-- Best validation loss achieved at epoch 51
-- No improvement for 10 consecutive epochs after epoch 51
-- Training stopped at epoch 61 (out of maximum 100 epochs)
-- Best weights from epoch 51 were restored for evaluation
+- Best validation loss achieved at epoch 29
+- No improvement for 10 consecutive epochs after epoch 29
+- Training stopped at epoch 39 (out of maximum 100 epochs)
+- Best weights from epoch 29 were restored for evaluation
 
-This saved ~39 epochs of unnecessary training and prevented the model from overfitting to training noise in later epochs.
+This saved ~61 epochs of unnecessary training and prevented the model from overfitting to training noise in later epochs.
 
 ## 9. Hyperparameter Tuning
 
@@ -125,21 +125,21 @@ These values are reflected in the final `config.yaml`.
 
 ## 10. Final Test Metrics
 
-The final model was trained for 61 epochs (early stopping triggered at epoch 61, best weights from epoch 51) using ResNetSmall with CosineAnnealingLR (T_max=100), CrossEntropyLoss, learning rate 0.001, batch size 64, and weight decay 0.0001.
+The final model was trained for 39 epochs (early stopping triggered at epoch 39, best weights from epoch 29) using ResNetSmall with CosineAnnealingLR (T_max=100), CrossEntropyLoss, learning rate 0.001, batch size 64, and weight decay 0.0001.
 
-**Overall test accuracy:** 98.90% (2,522 / 2,550 correct)
+**Overall test accuracy:** 98.43% (2,510 / 2,550 correct)
 
 **Per-class metrics:**
 
 | Class | Precision | Recall | F1-Score | Support |
 |---|---|---|---|---|
-| AnnualCrop | 0.980 | 0.993 | 0.987 | 450 |
-| Forest | 0.996 | 0.998 | 0.997 | 450 |
-| Highway | 0.992 | 0.987 | 0.989 | 375 |
-| Industrial | 0.979 | 0.981 | 0.980 | 375 |
-| Residential | 0.991 | 0.989 | 0.990 | 450 |
-| SeaLake | 0.996 | 0.984 | 0.990 | 450 |
-| **Macro Avg** | **0.989** | **0.989** | **0.989** | **2,550** |
+| AnnualCrop | 0.993 | 0.969 | 0.981 | 450 |
+| Forest | 0.993 | 0.996 | 0.994 | 450 |
+| Highway | 0.953 | 0.981 | 0.967 | 375 |
+| Industrial | 0.976 | 0.979 | 0.977 | 375 |
+| Residential | 0.991 | 0.991 | 0.991 | 450 |
+| SeaLake | 0.993 | 0.989 | 0.991 | 450 |
+| **Macro Avg** | **0.983** | **0.984** | **0.984** | **2,550** |
 
 ## 11. Honest Failure Analysis
 

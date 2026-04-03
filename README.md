@@ -168,32 +168,32 @@ The notebooks auto-detect the project root, so they work whether launched from t
 
 | Metric | Value |
 |---|---|
-| Test Accuracy | 98.90% |
-| Macro F1 | 0.989 |
-| Training Epochs | 61 (early stopping, best at epoch 51) |
+| Test Accuracy | 98.43% |
+| Macro F1 | 0.984 |
+| Training Epochs | 39 (early stopping, best at epoch 29) |
 
 | Class | Precision | Recall | F1 |
 |---|---|---|---|
-| AnnualCrop | 0.980 | 0.993 | 0.987 |
-| Forest | 0.996 | 0.998 | 0.997 |
-| Highway | 0.992 | 0.987 | 0.989 |
-| Industrial | 0.979 | 0.981 | 0.980 |
-| Residential | 0.991 | 0.989 | 0.990 |
-| SeaLake | 0.996 | 0.984 | 0.990 |
+| AnnualCrop | 0.993 | 0.969 | 0.981 |
+| Forest | 0.993 | 0.996 | 0.994 |
+| Highway | 0.953 | 0.981 | 0.967 |
+| Industrial | 0.976 | 0.979 | 0.977 |
+| Residential | 0.991 | 0.991 | 0.991 |
+| SeaLake | 0.993 | 0.989 | 0.991 |
 
 ### Task 2: OOD Detection
 
 | OOD Method | AUROC | FPR@95TPR |
 |---|---|---|
-| Softmax Confidence | 0.9365 | 0.2465 |
-| **Energy Score** | **0.9729** | **0.1230** |
-| Mahalanobis Distance | 0.6052 | 0.7695 |
+| Softmax Confidence | 0.9250 | 0.2720 |
+| **Energy Score** | **0.9499** | **0.2605** |
+| Mahalanobis Distance | 0.7205 | 0.5985 |
 
 | Clustering | Value |
 |---|---|
-| Clusters discovered | 4 |
+| Clusters discovered | 5 |
 | True ghost classes | 4 |
-| Noise points | 61 (0.6%) |
+| Noise points | 11 |
 | Best OOD method | Energy Score |
 
 ## Top Design Decisions
@@ -220,8 +220,8 @@ Place the downloaded file at `outputs/best_model.pt` to run notebooks 03 and 04 
 
 Checkpoint contents:
 - Architecture: `resnet_small` (1.9M parameters)
-- Best validation loss: achieved at epoch 51
-- Training stopped at epoch 61 (early stopping, patience=10)
+- Best validation loss: achieved at epoch 29
+- Training stopped at epoch 39 (early stopping, patience=10)
 
 ## Reproducibility
 
