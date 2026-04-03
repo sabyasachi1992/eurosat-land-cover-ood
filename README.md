@@ -111,7 +111,7 @@ cd eurosat-land-cover-ood
 
 Download the EuroSAT RGB dataset:
 
-- **Direct download:** [https://madm.dfki.de/files/sentinel/EuroSAT.zip](https://madm.dfki.de/files/sentinel/EuroSAT.zip)
+- **Direct download:** [https://zenodo.org/records/7711810/files/EuroSAT_RGB.zip](https://zenodo.org/records/7711810/files/EuroSAT_RGB.zip?download=1)
 - **Source:** [EuroSAT: Land Use and Land Cover Classification with Sentinel-2](https://github.com/phelber/EuroSAT)
 
 The zip contains 27,000 labeled 64×64 Sentinel-2 patches across 10 land cover classes.
