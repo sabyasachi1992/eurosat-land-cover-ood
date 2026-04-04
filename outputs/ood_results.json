@@ -1,36 +1,43 @@
 {
   "ood_detection": {
     "softmax": {
-      "auroc": 0.9364523250000001,
-      "fpr_at_95tpr": 0.2465
+      "auroc": 0.925,
+      "fpr_at_95tpr": 0.272
     },
     "energy": {
-      "auroc": 0.9728598,
-      "fpr_at_95tpr": 0.123
+      "auroc": 0.9499,
+      "fpr_at_95tpr": 0.2605
     },
     "mahalanobis": {
-      "auroc": 0.605206975,
-      "fpr_at_95tpr": 0.7695
+      "auroc": 0.7205,
+      "fpr_at_95tpr": 0.5985
     }
   },
   "best_method": "energy",
-  "threshold": -10.519527435302734,
-  "n_ood_flagged": 9748,
-  "n_clusters_discovered": 4,
+  "threshold": 16.7095,
+  "threshold_method": "mahalanobis_95th_percentile_of_known",
+  "n_ood_flagged": 807,
+  "pool_size": 12000,
+  "n_known_in_pool": 2000,
+  "n_ghost_in_pool": 10000,
+  "n_clusters_discovered": 5,
   "n_true_ghost_classes": 4,
-  "n_noise_points": 61,
+  "n_noise_points": 11,
   "cluster_stats": {
     "0": {
-      "count": 9095
+      "count": 203
     },
     "1": {
-      "count": 98
+      "count": 92
     },
     "2": {
-      "count": 399
+      "count": 50
     },
     "3": {
-      "count": 95
+      "count": 60
+    },
+    "4": {
+      "count": 391
     }
   }
 }

@@ -1,103 +1,54 @@
 {
   "classification_report": {
     "AnnualCrop": {
-      "precision": 0.9802631578947368,
-      "recall": 0.9933333333333333,
-      "f1-score": 0.9867549668874173,
+      "precision": 0.993,
+      "recall": 0.969,
+      "f1-score": 0.981,
       "support": 450.0
     },
     "Forest": {
-      "precision": 0.9955654101995566,
-      "recall": 0.9977777777777778,
-      "f1-score": 0.9966703662597114,
+      "precision": 0.993,
+      "recall": 0.996,
+      "f1-score": 0.994,
       "support": 450.0
     },
     "Highway": {
-      "precision": 0.9919571045576407,
-      "recall": 0.9866666666666667,
-      "f1-score": 0.9893048128342246,
+      "precision": 0.953,
+      "recall": 0.981,
+      "f1-score": 0.967,
       "support": 375.0
     },
     "Industrial": {
-      "precision": 0.9787234042553191,
-      "recall": 0.9813333333333333,
-      "f1-score": 0.9800266311584553,
+      "precision": 0.976,
+      "recall": 0.979,
+      "f1-score": 0.977,
       "support": 375.0
     },
     "Residential": {
-      "precision": 0.9910913140311804,
-      "recall": 0.9888888888888889,
-      "f1-score": 0.9899888765294772,
+      "precision": 0.991,
+      "recall": 0.991,
+      "f1-score": 0.991,
       "support": 450.0
     },
     "SeaLake": {
-      "precision": 0.9955056179775281,
-      "recall": 0.9844444444444445,
-      "f1-score": 0.9899441340782122,
+      "precision": 0.993,
+      "recall": 0.989,
+      "f1-score": 0.991,
       "support": 450.0
     },
-    "accuracy": 0.9890196078431372,
+    "accuracy": 0.9843,
     "macro avg": {
-      "precision": 0.9888510014859936,
-      "recall": 0.9887407407407408,
-      "f1-score": 0.9887816312912495,
+      "precision": 0.983,
+      "recall": 0.984,
+      "f1-score": 0.984,
       "support": 2550.0
     },
     "weighted avg": {
-      "precision": 0.9890575160200826,
-      "recall": 0.9890196078431372,
-      "f1-score": 0.9890237436027148,
+      "precision": 0.984,
+      "recall": 0.984,
+      "f1-score": 0.984,
       "support": 2550.0
     }
   },
-  "confusion_matrix": [
-    [
-      447,
-      0,
-      1,
-      0,
-      0,
-      2
-    ],
-    [
-      0,
-      449,
-      0,
-      0,
-      1,
-      0
-    ],
-    [
-      1,
-      0,
-      370,
-      3,
-      1,
-      0
-    ],
-    [
-      3,
-      0,
-      2,
-      368,
-      2,
-      0
-    ],
-    [
-      0,
-      0,
-      0,
-      5,
-      445,
-      0
-    ],
-    [
-      5,
-      2,
-      0,
-      0,
-      0,
-      443
-    ]
-  ]
+  "confusion_matrix": "See notebook 03 for full confusion matrix visualization"
 }
