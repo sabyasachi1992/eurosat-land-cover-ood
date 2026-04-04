@@ -214,7 +214,7 @@ The notebooks auto-detect the project root, so they work whether launched from t
 
 The best model weights are hosted on Google Drive:
 
-**Download:** [best_model.pt (7.8MB) — Google Drive](https://drive.google.com/file/d/1C3--YE42zzHYZH7BBNEaPAdsetpFFMoG/view?usp=drive_link)
+**Download:** [best_model.pt (7.8MB) — Google Drive](https://drive.google.com/file/d/13VDzd4zrWT6hApQMHLuvD8y9HB-Ig7lw/view?usp=drive_link)
 
 Place the downloaded file at `outputs/best_model.pt` to run notebooks 03 and 04 without retraining.
 
